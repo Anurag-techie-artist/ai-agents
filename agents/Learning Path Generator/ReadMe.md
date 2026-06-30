@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="../../assets/learning path architecture diagrams.png" alt="AI Agents Banner" width="100%">
-</p>
-
 <h1 align="center">🧠 Learning Path Generator</h1>
 
 <p align="center">
