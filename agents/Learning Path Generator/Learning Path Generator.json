@@ -1,0 +1,334 @@
+{
+  "name": "Learning Path Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d2124ae1-af9c-46a1-b98f-77efb55d2d02",
+      "name": "Topic to Learn",
+      "webhookId": "cbac5066-12b9-446b-bbfc-15f25222da16"
+    },
+    {
+      "parameters": {
+        "content": "Setting Up the Goal of the Agent using The Chat Trigger\n",
+        "height": 80,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -112
+      ],
+      "id": "c1078101-a8a2-4f64-ada6-2d4845495e3c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a day-wise learning path generator. When given a learning goal, create a curriculum with Google Docs and Calendar events.\nSTEP 1: PLAN THE CURRICULUM\nPlan the topics based on the number of days requested. Structure from beginner to advanced.\nSTEP 2: DETERMINE START DATE\n\nIf user says \"starting tomorrow\" → use tomorrow's date\nIf user says \"starting next Monday\" → calculate next Monday\nIf user says \"starting from [date]\" → use that date\nIf NO date mentioned → use TODAY's date\nToday is {{$now.format('YYYY-MM-DD')}}\n\nSTEP 3: RESEARCH RESOURCES\nUse SerpAPI 2-3 times total to find:\n\nYouTube videos\nArticles\nDocumentation\nExtract real URLs from results.\n\nSTEP 4: CREATE GOOGLE DOCUMENT\nCall \"Create a document in Google Docs\" tool with title \"[X]-Day [Topic] Learning Path\"\nNote the document ID from response.\nSTEP 5: UPDATE GOOGLE DOCUMENT\nCall \"Update a document in Google Docs\" once with all days' content in this format:\nDay 1: [Topic Name]\nDescription: [2-3 sentence overview]\nKey Learning Points:\n\n[Point 1]\n[Point 2]\n[Point 3]\nReference Links:\nVideo: [YouTube URL]\nArticle: [Article URL]\nDuration: 2 hours\n\nRepeat for all days.\nSTEP 6: CREATE CALENDAR EVENTS\nCreate events one by one. For each day:\n\nTime: 11:00 AM to 1:00 PM (2 hours)\nTimezone: +05:30\nFormat: YYYY-MM-DDTHH:MM:SS+05:30\n\nDate calculation:\n\nDay 1: START_DATE at 11:00 AM\nDay 2: START_DATE + 1 day at 11:00 AM\nDay 3: START_DATE + 2 days at 11:00 AM\nContinue incrementing by 1 day.\n\nCall \"Create an event in Google Calendar\" separately for each day with:\n\nStart: [DATE]T11:00:00+05:30\nEnd: [DATE]T13:00:00+05:30\nSummary: Day X: [Topic]\nDescription: [Full day content]\nUse_Default_Reminders: true\n\nSTEP 7: PROVIDE FINAL OUTPUT\nAfter all events are created, respond with:\n\"Learning Path Complete!\nDocument: [Google Docs URL]\nCalendar: I've added [X] events from [START_DATE] to [END_DATE] at 11:00 AM.\nYour [X]-day [topic] learning journey is ready!\"\nThen stop immediately.\nCRITICAL RULES:\n\nUse SerpAPI only 2-3 times total\nCreate Doc once\nUpdate Doc once with all content\nCreate calendar events separately for each day\nAlways use T11:00:00+05:30 for start time\nAlways use T13:00:00+05:30 for end time\nIncrement date by 1 for each day\nStop after providing final output\nNever leave Summary or Description empty\nCalculate start date from user input or use today"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        408,
+        0
+      ],
+      "id": "e8f27d38-4b34-4947-a695-89a281cc00c5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "It understands the user's learning goal, plans the curriculum, and coordinates all the connected tools to create the complete learning path",
+        "height": 96,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -112
+      ],
+      "id": "db5cb269-4dc1-40a2-bd01-893a4c791619",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "6044fd93-a3ac-41a0-b811-5d57b71aa937",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "D0Uj3VgbtAW8FAr5",
+          "name": "Google Gemini(PaLM) Api account 10633"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Brain of the Agent",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        400
+      ],
+      "id": "aca810fe-5405-4722-b6fd-5cd11a3d2602",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "toolDescription": "",
+        "url": "https://serpapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "Coffee"
+            },
+            {
+              "name": "location",
+              "value": "Austin, Texas, United States"
+            },
+            {
+              "name": "google_domain",
+              "value": "google.com"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "api_key",
+              "value": "26bee4dedce2ac775b3e5b53f42a6a592ea2ce301b5597a0f167b49cd55c3eaf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        352,
+        224
+      ],
+      "id": "e5687362-2bdd-4a18-a543-9541cd24082f",
+      "name": "SERPAPI"
+    },
+    {
+      "parameters": {
+        "folderId": "1pth4bxHtHFhQXvKDyk2X6Ro_kW-m5tEg",
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        480,
+        224
+      ],
+      "id": "51c2c690-1766-4e46-8cf6-a9c7a14fb212",
+      "name": "Create a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Text', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        0,
+        328
+      ],
+      "id": "2d1208b8-63f0-45e3-a8dc-08fe75304336",
+      "name": "Update a document in Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Text', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        608,
+        224
+      ],
+      "id": "c78b674b-6922-4b6a-abed-0e71fd2187c9",
+      "name": "Update a document in Google Docs1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "yoshianuragtesla369@gmail.com",
+          "mode": "list",
+          "cachedResultName": "yoshianuragtesla369@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        224
+      ],
+      "id": "82907959-ac3c-4b60-88a9-7ff667e62cef",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YNwqWNm5nH8vxMT2",
+          "name": "Google Calendar account 879"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Topic to Learn": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SERPAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document in Google Docs1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8536c4f6-7980-488d-9c82-b0b32940d1bf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "969257b09ad2942bbaff2e2288304f4969030574d109cdeca05bf11f630884df"
+  },
+  "id": "UmkFmqTxmFkRWIQS",
+  "tags": []
+}

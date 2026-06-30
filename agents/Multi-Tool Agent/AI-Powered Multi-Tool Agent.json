@@ -1,0 +1,248 @@
+{
+  "name": "AI-Powered Multi-Tool Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "# Role\nYou an intelligent AI assistant that helps users via Telegram.\nYou are talking to {{ $json.message.from.first_name }}{{ $json.message.from.last_name }}\n\n# Behavior\nYou should:\n- Understand the user's intent clearly.\n- Choose the correct tool from the available ones ONLY when needed.\n- Otherwise, answer directly.\n\n# Available Tools & When to Use Them:\n\n## 1. Google Gemini Chat Model\nUse for:\n- Natural conversations\n- Creative writing\n- Open-ended questions\n- Explaining concepts\n- General text generation\n\n## 2. SerpAPI\nUse for:\n- Real-time or factual information from the web\n- News, current events, live sports, current prices\n- Anything requiring recent or external data\n\nWhen using the SerpAPI tool, always structure the call like:\nUse tool SerpAPI with input:\n{\n  \"q\": \"search your query here\"\n}\n\n## 3. Calculator\nUse for:\n- Arithmetic\n- Percentages\n- Unit conversions\n- Date or time differences\n\nOnly use if the question involves numbers or calculations. Examples:\n- \"What is 40% of 500?\"\n- \"Convert 20 km to miles\"\n\n\n# 4. Wikipedia\nUse for:\n- When searching for a person or company\n\n# 5. Google Calender\nUse for:\n- When creating a calender event \n- Deleting or modifying calender events"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        0
+      ],
+      "id": "b92904a9-2d0c-4306-ac6f-0bfad26ca77b",
+      "name": "Multi Tool"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "ce73d3df-9e3d-464e-b111-e50f16db1021",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xrBNDwbQwsh2TXkv",
+          "name": "Google Gemini(PaLM) Api account 10721"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        352,
+        224
+      ],
+      "id": "2a086da3-47e3-4548-ae55-476cadb91c2d",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "o1cwrvyL495rGEWC",
+          "name": "SerpAPI account 1027"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "50106d22-e462-40d3-9767-cd0617469dc0",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        608,
+        224
+      ],
+      "id": "a217e1bb-178d-415d-8441-6d41eea1e868",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7bcc10b5-50c2-4827-83ab-459665d7ddc8",
+      "name": "Telegram Trigger",
+      "webhookId": "3ae8c8bd-f5cd-4e8e-8a3b-8dccf2b8f69f",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZSO3GJHAHHqHZyJA",
+          "name": "Telegram account 3307"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "d118cf6d-964e-491c-9066-cf5f98c394cd",
+      "name": "Send a text message",
+      "webhookId": "976b8566-cf1e-49e8-931e-0c85fe87c116",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZSO3GJHAHHqHZyJA",
+          "name": "Telegram account 3307"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "classroom106046930281925736687@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Anurag tesla"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        224
+      ],
+      "id": "04e8af7d-eb8a-4c83-9185-abb34c06a02b",
+      "name": "Get an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YNwqWNm5nH8vxMT2",
+          "name": "Google Calendar account 879"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Multi Tool": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Multi Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "da251b62-d7c2-43a6-8813-86d94231f39a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "969257b09ad2942bbaff2e2288304f4969030574d109cdeca05bf11f630884df"
+  },
+  "id": "Xz72bWDMSpOJJcB4",
+  "tags": []
+}

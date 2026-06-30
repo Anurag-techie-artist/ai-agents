@@ -1,0 +1,275 @@
+{
+  "name": "Transcription Summarizer Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "55e96486-3d83-4e2e-9498-c41b079128a5",
+      "name": "When chat message received",
+      "webhookId": "836f374b-47e4-4339-ab9b-d3ff8d96a18d"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.chatInput }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e4f0838f-d684-45d7-9caa-74ca46ab86ff",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are a document processor and summarizer. Your job is to create a document with original content and summary, then return the summary content to the user.\nStep-by-Step Execution Flow:\n\nCreate Document: Use \"Create document\" tool to create a new Google Doc\nAdd Original Content: Use \"Update document\" tool to add the user's provided text\nGenerate Summary: Analyze the content and create a comprehensive summary with bullet points covering:\n• Key themes and main points\n• Important details and insights\n• Action items or next steps\n• Conclusions and recommendations\n• Notable data or statistics\nAdd Summary to Document: Use \"Update document\" tool again to append the summary section to the document\nRetrieve Final Content: Use \"get document\" tool to fetch the complete document content including both original text and summary\nReturn Summary: Extract and return the summary portion from the retrieved document content to the user\n\nImportant Instructions:\n\nAlways use \"get document\" at the end to retrieve the full content\nExtract and display the summary section in your response to the user\nProvide both the document link AND the summary content in your output\nFormat the summary clearly with bullet points for easy reading\n\nOutput Format:\n\"Here is your document: [link]\nSUMMARY:\n\nPoint 1\nPoint 2\nPoint 3\n[etc.]\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        576,
+        0
+      ],
+      "id": "66d5c10f-3866-469e-ad9d-77bede14b4fa",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        224
+      ],
+      "id": "e3067422-3a38-4dc2-98b5-c0efd5162b42",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "D0Uj3VgbtAW8FAr5",
+          "name": "Google Gemini(PaLM) Api account 10633"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "1pth4bxHtHFhQXvKDyk2X6Ro_kW-m5tEg",
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        736,
+        224
+      ],
+      "id": "4f223957-31e4-4902-b3a4-a3390d24c2f2",
+      "name": "Create a document in Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Text', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        208
+      ],
+      "id": "3183b5c7-c434-493c-bf81-1b263fc630fa",
+      "name": "Update a document in Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "bearer $APIKEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-large-v3-turbo"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        0
+      ],
+      "id": "bc28b0b2-6217-4e65-b7ea-4f44dafdf5d3",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        912,
+        288
+      ],
+      "id": "83a295c1-c1d4-4ab0-99b4-6d7337376d19",
+      "name": "Get a document in Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "xbsGnl8fjKfK1mvh",
+          "name": "Google Docs account 979"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document in Google Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document in Google Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document in Google Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "71289649-80e4-4717-ad16-b781003b231d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "969257b09ad2942bbaff2e2288304f4969030574d109cdeca05bf11f630884df"
+  },
+  "id": "nQfbP16H82Sg8jZP",
+  "tags": []
+}
